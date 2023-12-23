@@ -67,6 +67,13 @@ public class Manage {
                 break;
             case "4":
                 // 修改菜单
+                System.out.println("输入name:");
+                String name1 = sc.next();
+                System.out.println("输入id:");
+                String id2 = sc.next();
+                System.out.println("输入room:");
+                String room1 = sc.next();
+                updateStudent(name1,id2,room1);
             default:
                 System.out.println("输入错误,重新输入");
                 manage();
@@ -187,5 +194,24 @@ public class Manage {
             System.out.println("查无此人");
         }
         manage();
+    }
+     // 修改学生
+    private static void updateStudent(String id, String name, String room) {
+        int index = -1;
+        for (int i = 0; i < count; i++) {
+            if (Objects.equals(students[i].id, id)) {
+                index = i;
+                break;
+            }
+        }
+
+        if (index != -1) {
+            students[index].name = name;
+            students[index].room = room;
+            System.out.println("学生信息修改成功");
+        } else {
+            System.out.println("查无此人");
+        }
+        manage(); // 返回主菜单
     }
 }
