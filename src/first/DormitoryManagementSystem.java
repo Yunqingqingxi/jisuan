@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 
 public class DormitoryManagementSystem {
-    private StudentController studentController = new StudentController();
+    private static final StudentController studentController = new StudentController();
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
@@ -23,8 +23,16 @@ public class DormitoryManagementSystem {
         });
     }
 
+
+
     private void showMainMenu() {
         JFrame frame = new JFrame("宿舍管理系统");
+
+        ImageIcon icon = new ImageIcon("F:\\List\\sd\\src\\image\\huaji.jpg"); // Replace with the actual path
+
+        // Set the icon for the frame
+        frame.setIconImage(icon.getImage());
+
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(400, 300);
 
@@ -98,14 +106,12 @@ public class DormitoryManagementSystem {
             }
         });
 
-        frame.setLocationRelativeTo(null);  // Center the frame on the screen
-        frame.setVisible(true);
-
         // 设置焦点在主窗口上
+        frame.setFocusable(true);
         frame.requestFocus();
 
-        // 尝试设置焦点在面板上
-        panel.requestFocusInWindow();
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
     }
 
     private void showInsertPage() {
@@ -539,6 +545,7 @@ public class DormitoryManagementSystem {
 
 
     private void loadStudents() {
+        studentController.createDataDirectory();
         studentController.loadStudentsFromFile();
         // 如果没有加载到学生信息，则初始化一些示例数据
         if (studentController.getAllStudents().isEmpty()) {

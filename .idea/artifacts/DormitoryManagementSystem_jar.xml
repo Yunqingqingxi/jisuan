@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="DormitoryManagementSystem.jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/DormitoryManagementSystem_jar</output-path>
+    <root id="archive" name="sd.jar">
+      <element id="module-output" name="sd" />
+    </root>
+  </artifact>
+</component>

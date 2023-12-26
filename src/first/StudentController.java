@@ -9,17 +9,31 @@ import java.util.stream.Collectors;
 
 public class StudentController {
     private final List<Student> students = new ArrayList<>();
-    private static final String FILE_PATH = "F:\\List\\sd\\students.txt";
+    private static final String FILE_PATH = "D:\\Codefile1\\students.dat";
+
+    public List<Student> getStudents() {
+        return students;
+    }
 
     public void loadStudentsFromFile() {
-        try (BufferedReader reader = new BufferedReader(new FileReader(FILE_PATH))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                Student student = new Student(line);
-                students.add(student);
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(FILE_PATH))) {
+            students.addAll((List<Student>) ois.readObject());
+        } catch (FileNotFoundException e) {
+            System.out.println("File not found. Creating a new file.");
+            saveStudentsToFile1();  // Save an empty list to create the file
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void createDataDirectory() {
+        File dataDirectory = new File(FILE_PATH).getParentFile();
+        if (!dataDirectory.exists()) {
+            if (dataDirectory.mkdirs()) {
+                System.out.println("Data directory created: " + dataDirectory.getAbsolutePath());
+            } else {
+                System.err.println("Failed to create data directory!");
             }
-        } catch (IOException e) {
-            System.out.println("加载学生信息出错：" + e.getMessage());
         }
     }
 
@@ -248,6 +262,10 @@ public class StudentController {
     }
 
     public void saveStudentsToFile() {
+
+
+
+
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_PATH))) {
             for (Student student : students) {
                 writer.write(student.toFileString());
@@ -255,6 +273,13 @@ public class StudentController {
             }
         } catch (IOException e) {
             System.out.println("保存学生信息出错：" + e.getMessage());
+        }
+    }
+    public void saveStudentsToFile1() {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_PATH))) {
+            oos.writeObject(students);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 }
