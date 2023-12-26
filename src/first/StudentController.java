@@ -48,7 +48,36 @@ public class StudentController {
         }
     }
 
+    public void deleteStudentByProperty(String id, String property) {
+        List<Student> studentsToDelete = new ArrayList<>();
 
+        // 根据属性查找匹配的学生
+        for (Student student : students) {
+            switch (property) {
+                case "姓名":
+                    if (student.getName().equals(id)) {
+                        studentsToDelete.add(student);
+                    }
+                    break;
+                case "学号":
+                    if (student.getStudentId().equals(id)) {
+                        studentsToDelete.add(student);
+                    }
+                    break;
+                case "房号":
+                    if (student.getRoomNumber() == Integer.parseInt(id)) {
+                        studentsToDelete.add(student);
+                    }
+                    break;
+                // 可以根据需要添加其他属性的匹配
+                default:
+                    break;
+            }
+        }
+
+        // 从学生列表中删除匹配的学生
+        students.removeAll(studentsToDelete);
+    }
 
 
     public List<Student> queryStudents(String keyword, String searchType) {

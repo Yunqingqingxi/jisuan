@@ -5,6 +5,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +36,7 @@ public class DormitoryManagementSystem {
         gbc.gridy = 0;
         gbc.insets = new Insets(5, 5, 5, 5); // Add some padding
 
-        JButton insertButton = new JButton("插入学生信息");
+        JButton insertButton = new JButton("(1)插入学生信息 ");
         insertButton.addActionListener(e -> {
             frame.dispose();
             showInsertPage();
@@ -42,7 +44,7 @@ public class DormitoryManagementSystem {
         panel.add(insertButton, gbc);
 
         gbc.gridy++;
-        JButton deleteButton = new JButton("删除学生信息");
+        JButton deleteButton = new JButton("(2)删除学生信息 ");
         deleteButton.addActionListener(e -> {
             frame.dispose();
             showDeletePage();
@@ -50,7 +52,7 @@ public class DormitoryManagementSystem {
         panel.add(deleteButton, gbc);
 
         gbc.gridy++;
-        JButton modifyButton = new JButton("修改学生信息");
+        JButton modifyButton = new JButton("(3)修改学生信息 ");
         modifyButton.addActionListener(e -> {
             frame.dispose();
             showModifyPage();
@@ -58,7 +60,7 @@ public class DormitoryManagementSystem {
         panel.add(modifyButton, gbc);
 
         gbc.gridy++;
-        JButton queryButton = new JButton("查询学生信息");
+        JButton queryButton = new JButton("(4)查询学生信息 ");
         queryButton.addActionListener(e -> {
             frame.dispose();
             showQueryPage();
@@ -66,15 +68,45 @@ public class DormitoryManagementSystem {
         panel.add(queryButton, gbc);
 
         gbc.gridy++;
-        JButton exitButton = new JButton("退出系统");
+        JButton exitButton = new JButton("(5)退出系统 ");
         exitButton.addActionListener(e -> System.exit(0));
         panel.add(exitButton, gbc);
 
+        // 添加按数字键的监听器
+        frame.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                switch (e.getKeyChar()) {
+                    case '1':
+                        insertButton.doClick();
+                        break;
+                    case '2':
+                        deleteButton.doClick();
+                        break;
+                    case '3':
+                        modifyButton.doClick();
+                        break;
+                    case '4':
+                        queryButton.doClick();
+                        break;
+                    case '5':
+                        exitButton.doClick();
+                        break;
+                    default:
+                        break;
+                }
+            }
+        });
+
         frame.setLocationRelativeTo(null);  // Center the frame on the screen
         frame.setVisible(true);
+
+        // 设置焦点在主窗口上
+        frame.requestFocus();
+
+        // 尝试设置焦点在面板上
+        panel.requestFocusInWindow();
     }
-
-
 
     private void showInsertPage() {
         JFrame frame = new JFrame("插入学生信息");
@@ -151,10 +183,10 @@ public class DormitoryManagementSystem {
         });
 
         // 新增：注销按钮
-        JButton logoutButton = new JButton("回到主界面");
+        JButton logoutButton = new JButton("刷新");
         logoutButton.addActionListener(e -> {
             frame.dispose();
-            showMainMenu();
+            showInsertPage();
         });
 
         JPanel buttonPanel = new JPanel();
@@ -176,60 +208,83 @@ public class DormitoryManagementSystem {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(400, 300);
 
-        JPanel panel = new JPanel();
+        JPanel panel = new JPanel(new GridBagLayout());
         frame.getContentPane().add(panel);
 
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.insets = new Insets(5, 5, 5, 5);
+
+        // 让下拉列表框居中
+        gbc.gridwidth = 2;
+        JComboBox<String> propertyComboBox = new JComboBox<>(new String[]{"姓名", "学号", "房号"});
+        panel.add(propertyComboBox, gbc);
+
+        // 重置gridwidth
+        gbc.gridwidth = 1;
+
+        gbc.gridy++;
         JTextField idField = new JTextField(20);
+        JLabel idLabel = new JLabel("新值:");
+        panel.add(idLabel, gbc);
+
+        gbc.gridx++;
+        panel.add(idField, gbc);
 
         JButton deleteButton = new JButton("删除");
-        deleteButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String id = idField.getText();
-                studentController.deleteStudent(id);
-                studentController.saveStudentsToFile();   // 保存学生信息到文件中
-                JOptionPane.showMessageDialog(null, "学生信息删除成功！");
-                frame.dispose();
-                showMainMenu();
-            }
-        });
+        gbc.gridx = 0;
+        gbc.gridy++;
+        gbc.gridwidth = 2;
+        panel.add(deleteButton, gbc);
 
         frame.getRootPane().setDefaultButton(deleteButton);
 
         // 新增：返回上一页按钮
         JButton backButton = new JButton("返回上一页");
-        backButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                frame.dispose();
-                showMainMenu();
-            }
+        backButton.addActionListener(e -> {
+            frame.dispose();
+            showMainMenu();
         });
 
         // 新增：注销按钮
-        JButton logoutButton = new JButton("回到主界面");
-        logoutButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                frame.dispose();
-                showMainMenu();
-            }
+        JButton logoutButton = new JButton("刷新");
+        logoutButton.addActionListener(e -> {
+            frame.dispose();
+            showDeletePage();
         });
 
-        panel.add(new JLabel("学号:"));
-        panel.add(idField);
-        panel.add(deleteButton);
         JPanel buttonPanel = new JPanel();
+        buttonPanel.add(backButton);
+        buttonPanel.add(logoutButton);
 
-        buttonPanel.add(backButton);// 将返回上一页按钮添加到界面中
-        buttonPanel.add(logoutButton);  // 将注销按钮添加到界面中
+        gbc.gridy++;
+        gbc.gridwidth = 2;
+        panel.add(buttonPanel, gbc);
 
-        frame.add(panel, BorderLayout.CENTER);
-        frame.add(buttonPanel, BorderLayout.SOUTH);
+        // 添加监听器，当选择的属性改变时，更新标签
+        propertyComboBox.addActionListener(e -> {
+            String selectedProperty = (String) propertyComboBox.getSelectedItem();
+            // 设置标签文字 "新" + selectedProperty + ":"
+            idLabel.setText("新" + selectedProperty + ":");
+        });
+
+        // 删除按钮的动作
+        deleteButton.addActionListener(e -> {
+            String id = idField.getText();
+            String selectedProperty = (String) propertyComboBox.getSelectedItem();
+            studentController.deleteStudentByProperty(id, selectedProperty);
+            studentController.saveStudentsToFile();
+            JOptionPane.showMessageDialog(null, "学生信息删除成功！");
+            frame.dispose();
+            showMainMenu();
+        });
 
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
     }
+
+
 
     private void showModifyPage() {
         JFrame frame = new JFrame("修改学生信息");
@@ -272,13 +327,6 @@ public class DormitoryManagementSystem {
         propertyComboBox.setPreferredSize(new Dimension(150, 20));
         panel.add(propertyComboBox, gbc);
 
-        gbc.gridx = 0;
-        gbc.gridy++;
-        JLabel valueLabel = new JLabel("新值:");
-        gbc.gridwidth = 2;  // 让标签跨两列
-        gbc.anchor = GridBagConstraints.CENTER;
-        panel.add(valueLabel, gbc);
-
         gbc.gridwidth = 1;  // 恢复默认的列宽
 
         gbc.gridx++;
@@ -288,12 +336,12 @@ public class DormitoryManagementSystem {
 
         // Map to store dynamically created labels for "新值"
         Map<String, JLabel> valueLabels = new HashMap<>();
-        valueLabels.put("姓名", new JLabel("新姓名:"));
-        valueLabels.put("学号", new JLabel("新学号:"));
-        valueLabels.put("房号", new JLabel("新房号:"));
-
-        // Initially hide all value labels
-        valueLabels.values().forEach(label -> label.setVisible(false));
+        JLabel nameLabel1 = new JLabel("新姓名:");
+        JLabel idLabel1 = new JLabel("新学号:");
+        JLabel roomLabel = new JLabel("新房号:");
+        valueLabels.put("姓名", nameLabel1);
+        valueLabels.put("学号", idLabel1);
+        valueLabels.put("房号", roomLabel);
 
         gbc.gridx = 0;
         gbc.gridy++;
@@ -312,12 +360,12 @@ public class DormitoryManagementSystem {
             JLabel selectedValueLabel = valueLabels.get(selectedProperty);
             selectedValueLabel.setVisible(true);
 
-            // Update the dynamic label based on the selected property
-            dynamicValueLabel.setText(selectedValueLabel.getText());
+            dynamicValueLabel.setText("新" + selectedProperty + ":");
 
             // Show selected value label
             dynamicValueLabel.setVisible(true);
         });
+
 
         gbc.gridx = 0;
         gbc.gridy++;
@@ -364,10 +412,10 @@ public class DormitoryManagementSystem {
         });
 
         // 新增：注销按钮
-        JButton logoutButton = new JButton("回到主界面");
+        JButton logoutButton = new JButton("刷新");
         logoutButton.addActionListener(e -> {
             frame.dispose();
-            showMainMenu();
+            showModifyPage();
         });
 
         JPanel buttonPanel = new JPanel();
@@ -422,12 +470,12 @@ public class DormitoryManagementSystem {
         });
 
         // 新增：注销按钮
-        JButton logoutButton = new JButton("回到主界面");
+        JButton logoutButton = new JButton("刷新");
         logoutButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 frame.dispose();
-                showMainMenu();
+                showQueryPage();
             }
         });
 
@@ -467,7 +515,7 @@ public class DormitoryManagementSystem {
         JButton backButton = new JButton("返回上一页");
         backButton.addActionListener(e -> {
             frame.dispose();
-            showMainMenu();
+            showQueryPage();
         });
 
         // 新增：注销按钮
