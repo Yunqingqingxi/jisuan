@@ -42,7 +42,9 @@ public class StudentController {
         } catch (EOFException e) {
             System.out.println("文件为空，未加载任何数据。");
         } catch (IOException | ClassNotFoundException e) {
+            saveStudentsToFile1();
             System.out.println("从文件加载学生数据时出错：" + e.getMessage());
+
             e.printStackTrace();
 
             // 删除损坏的文件并创建新文件
