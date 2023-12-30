@@ -30,9 +30,9 @@ public class StudentController {
         File dataDirectory = new File(FILE_PATH).getParentFile();
         if (!dataDirectory.exists()) {
             if (dataDirectory.mkdirs()) {
-                System.out.println("Data directory created: " + dataDirectory.getAbsolutePath());
+                System.out.println("数据创建在: " + dataDirectory.getAbsolutePath());
             } else {
-                System.err.println("Failed to create data directory!");
+                System.err.println("创建数据文件失败!");
             }
         }
     }
@@ -257,14 +257,7 @@ public class StudentController {
         return students;
     }
 
-    private void sortStudentsByStudentId() {
-        students.sort(Comparator.comparing(Student::getStudentId));
-    }
-
     public void saveStudentsToFile() {
-
-
-
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_PATH))) {
             for (Student student : students) {
