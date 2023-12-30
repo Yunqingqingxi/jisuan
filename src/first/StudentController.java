@@ -17,22 +17,55 @@ public class StudentController {
 
     public void loadStudentsFromFile() {
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(FILE_PATH))) {
-            students.addAll((List<Student>) ois.readObject());
+            // 读取序列化的对象
+            Object obj = ois.readObject();
+
+            if (obj instanceof List<?>) {
+                // 如果是 List 类型，添加到学生列表
+                List<?> loadedList = (List<?>) obj;
+                if (!loadedList.isEmpty() && loadedList.get(0) instanceof Student) {
+                    students.addAll((List<Student>) loadedList);
+                } else {
+                    // 非预期的对象类型，处理方式（例如打印错误信息或者创建新文件）取决于具体需求
+                    System.err.println("文件中包含非预期的对象类型。");
+                    createDataDirectory();  // 或者其他处理方式
+                }
+            } else {
+                // 非预期的对象类型，处理方式取决于具体需求
+                System.err.println("文件中包含非预期的对象类型。");
+                createDataDirectory();  // 或者其他处理方式
+            }
+
         } catch (FileNotFoundException e) {
-            System.out.println("File not found. Creating a new file.");
-            saveStudentsToFile1();  // Save an empty list to create the file
+            System.out.println("文件未找到，正在创建新文件。");
+            createDataDirectory();
+        } catch (EOFException e) {
+            System.out.println("文件为空，未加载任何数据。");
         } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
+            System.out.println("从文件加载学生数据时出错：" + e.getMessage());
+            e.printStackTrace();
+
+            // 删除损坏的文件并创建新文件
+            File corruptedFile = new File(FILE_PATH);
+            if (corruptedFile.exists() && corruptedFile.delete()) {
+                System.out.println("损坏的文件已删除，正在创建新文件。");
+                createDataDirectory();
+            } else {
+                System.err.println("无法删除损坏的文件。");
+            }
         }
     }
+
+
+
 
     public void createDataDirectory() {
         File dataDirectory = new File(FILE_PATH).getParentFile();
         if (!dataDirectory.exists()) {
             if (dataDirectory.mkdirs()) {
-                System.out.println("Data directory created: " + dataDirectory.getAbsolutePath());
+                System.out.println("数据创建在: " + dataDirectory.getAbsolutePath());
             } else {
-                System.err.println("Failed to create data directory!");
+                System.err.println("创建数据文件失败!");
             }
         }
     }
@@ -41,10 +74,6 @@ public class StudentController {
         students.add(student);
     }
 
-    public void deleteStudent(String studentId) {
-        List<Student> matchingStudents = binarySearchByStudentId(studentId);
-        students.removeAll(matchingStudents);
-    }
 
     public void modifyStudentByNameAndID(String name, String studentId, String newName, String newStudentId, int newRoomNumber) {
         for (Student student : students) {
@@ -257,14 +286,7 @@ public class StudentController {
         return students;
     }
 
-    private void sortStudentsByStudentId() {
-        students.sort(Comparator.comparing(Student::getStudentId));
-    }
-
     public void saveStudentsToFile() {
-
-
-
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_PATH))) {
             for (Student student : students) {
@@ -276,11 +298,12 @@ public class StudentController {
         }
     }
     public void saveStudentsToFile1() {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_PATH))) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_PATH, true))) {
             oos.writeObject(students);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
+
 }
 
